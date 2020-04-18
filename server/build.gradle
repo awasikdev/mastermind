@@ -1,0 +1,29 @@
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+apply plugin: 'application'
+
+mainClassName = 'com.awasik.server.ServerLauncher'
+
+task dist(type: Jar) {
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+  dependsOn configurations.runtimeClasspath
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  with jar
+}
+
+task copyProc(type: Copy) {
+  from file("Procfile")
+  into file("build/libs/")
+}
+
+dist.finalizedBy(copyProc)
+
+dist.dependsOn classes
+
+eclipse.project {
+  name = appName + "-server"
+}
